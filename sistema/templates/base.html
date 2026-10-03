@@ -4,6 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#212529">
+
+    <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
+
     <meta http-equiv="refresh" content="45">
     <title>Sistema de Serviços</title>
 
@@ -56,6 +63,19 @@
     {% endblock %}
 
 </div>
+<script>
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+            navigator.serviceWorker.register("{% static 'service-worker.js' %}")
+                .then(function (registration) {
+                    console.log("PWA registrada:", registration.scope);
+                })
+                .catch(function (error) {
+                    console.error("Erro ao registrar PWA:", error);
+                });
+        });
+    }
+</script>
 
 </body>
 
