@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Agendamentos</h1>
+    <a href="{% url 'novo_agendamento' %}" class="btn btn-primary">
+        Novo Agendamento
+    </a>
+</div>
+
+<a href="{% url 'inicio' %}" class="btn btn-secondary mb-4">
+    Voltar ao Dashboard
+</a>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered align-middle">
+
+        <thead class="table-dark">
+            <tr>
+                <th>Cliente</th>
+                <th>Serviço</th>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Status</th>
+                <th>Chegada</th>
+                <th>Observação</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+        {% for agendamento in agendamentos %}
+
+            <tr>
+                <td>{{ agendamento.cliente.nome }}</td>
+
+                <td>{{ agendamento.servico.descricao }}</td>
+
+                <td>{{ agendamento.data|date:"d/m/Y" }}</td>
+
+                <td>{{ agendamento.horario|time:"H:i" }}</td>
+
+                <td>
+                    {% if agendamento.status == 'AGENDADO' %}
+                        <span class="badge bg-warning text-dark">
+                            Agendado
+                        </span>
+                    {% elif agendamento.status == 'REALIZADO' %}
+                        <span class="badge bg-success">
+                            Realizado
+                        </span>
+                    {% elif agendamento.status == 'CANCELADO' %}
+                        <span class="badge bg-danger">
+                            Cancelado
+                        </span>
+                    {% endif %}
+                </td>
+
+                <td>
+
+                    {% if agendamento.chegou == True %}
+
+                        <span class="badge bg-success">
+                            Chegou
+                        </span>
+
+                    {% elif agendamento.chegou == False %}
+
+                        <span class="badge bg-danger">
+                            Não veio
+                        </span>
+
+                    {% elif agendamento.pode_registrar_chegada %}
+
+                        <form method="post"
+                              action="{% url 'registrar_chegada' agendamento.id 'sim' %}"
+                              class="d-inline">
+
+                            {% csrf_token %}
+
+                            <button type="submit" class="btn btn-success btn-sm">
+                                Chegou
+                            </button>
+
+                        </form>
+
+                        <form method="post"
+                              action="{% url 'registrar_chegada' agendamento.id 'nao' %}"
+                              class="d-inline">
+
+                            {% csrf_token %}
+
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                Não veio
+                            </button>
+
+                        </form>
+
+                    {% else %}
+
+                        <span class="text-muted">
+                            Aguardando horário
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>{{ agendamento.observacao }}</td>
+
+                <td>
+                    <div class="mb-2">
+
+                        <a href="{% url 'editar_agendamento' agendamento.id %}"
+                           class="btn btn-warning btn-sm">
+                            Editar
+                        </a>
+
+                        <a href="{% url 'excluir_agendamento' agendamento.id %}"
+                           class="btn btn-danger btn-sm">
+                            Excluir
+                        </a>
+
+                    </div>
+
+                    <div>
+
+                        <form method="post"
+                              action="{% url 'alterar_status_agendamento' agendamento.id 'AGENDADO' %}"
+                              class="d-inline">
+
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                    class="btn btn-outline-warning btn-sm">
+                                Agendado
+                            </button>
+
+                        </form>
+
+                        <form method="post"
+                              action="{% url 'alterar_status_agendamento' agendamento.id 'REALIZADO' %}"
+                              class="d-inline">
+
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                    class="btn btn-outline-success btn-sm">
+                                Realizado
+                            </button>
+
+                        </form>
+
+                        <form method="post"
+                              action="{% url 'alterar_status_agendamento' agendamento.id 'CANCELADO' %}"
+                              class="d-inline">
+
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                    class="btn btn-outline-danger btn-sm">
+                                Cancelado
+                            </button>
+
+                        </form>
+
+                    </div>
+                </td>
+
+            </tr>
+
+        {% empty %}
+
+            <tr>
+                <td colspan="8" class="text-center">
+                    Nenhum agendamento cadastrado.
+                </td>
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+</div>
+
+{% endblock %}
